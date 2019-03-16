@@ -1,0 +1,45 @@
+from scipy.signal import lfilter,dlti,dimpulse                      #Base on Scipy,numpy,matplotlib
+import numpy as np
+import matplotlib.pyplot as plt
+def bigshow(*v):
+    if len(v) < 2 or len(v) > 4:                                                #Determine the number of parameters and assign values
+        print('Error. Wrong number of input arguments.')     #Report error if variables <2&>4 
+    else:                                                                                  #Set a,b,tsim,timpulse
+        a = v[0]
+        b = v[1]
+        if len(v) >= 3:                                                                           
+            tsim = v[2]
+            if len(v) >= 4:                                                       
+                timpulse = v[3]
+            else:
+                timpulse = 30
+        else:
+            tsim = 80
+            timpulse = 26
+    #First generate the simulation (Gaussian errors)
+    nn = 100                                                                          #Number of observations to be discarded
+    u = np.random.randn(tsim+nn)                                    #Generate white noise with var σ^2 = 1
+    y = lfilter(b,a,u,-1 ,None)                                               #Digital filter
+
+    plt.figure(figsize=(10, 4))                                               #Set display size 1000*400
+    plt.subplot(1,2,1)
+    plt.plot(y)
+    plt.title('Simulation')
+    plt.xlim(0,tsim)
+    #Impulse Response
+    sys = dlti(b,a)                                                                #Building function system
+    x1,y1 = dimpulse(sys)                                                     #Impulse response function
+    plt.subplot(1,2,2)
+    plt.plot(x1,y1[-1])
+    plt.title('Impulse Response')
+    plt.xlim(0,timpulse)
+    #plt.ylim(0) Set y limit
+    plt.show()
+
+bigshow([1],[1])                                                                  #Results
+bigshow([1,0],[1,0.5])
+bigshow([1,0,0 ],[1,0.5,0.4])
+bigshow([1,-0.999],[1,-0.4])
+bigshow([1,-0.8,0],[1,0.5,0.4])
+
+
